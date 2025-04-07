@@ -1,37 +1,57 @@
-// Tutorial for connecting the arduino to the Arduini IoT Cloud
+// Tutorial for connecting the Arduino to the Arduino IoT Cloud
 
-// Include the thingProperties file needed for the cloud connection
-#include "thingProperties.h"
-#include "DHT.h"
+// Include the necessary files for cloud connection and sensor functionality
+#include "thingProperties.h" // Contains IoT Cloud properties
+#include "DHT.h"             // Library for the DHT sensor
 
-// In this case, we will upload the temperature and humidity values from a DHT11 sensor
-
+// Define the DHT sensor pin and type
 #define DHTPIN 7
 #define DHTTYPE DHT11
 
+// Initialize the DHT sensor
 DHT dht(DHTPIN, DHTTYPE);
 
-void setup() {
+void setup()
+{
+  // Start the serial communication for debugging
   Serial.begin(9600);
+
+  // Initialize the DHT sensor
   dht.begin();
-  delay(1500); 
+  delay(1500); // Allow the sensor to stabilize
+
+  // Initialize IoT Cloud properties
   initProperties();
+
+  // Start the Arduino IoT Cloud connection
   ArduinoCloud.begin(ArduinoIoTPreferredConnection);
+
+  // Set the debug message level and print debug information
   setDebugMessageLevel(2);
   ArduinoCloud.printDebugInfo();
 }
 
-void loop() {
+void loop()
+{
+  // Update the IoT Cloud connection
   ArduinoCloud.update();
-  float humi  = dht.readHumidity();
+
+  // Read humidity and temperature from the DHT sensor
+  float humi = dht.readHumidity();
   float tempC = dht.readTemperature();
-  
-  if (isnan(humi) || isnan(tempC)){
+
+  // Check if the readings are valid
+  if (isnan(humi) || isnan(tempC))
+  {
     Serial.println("Failed to read from DHT sensor!");
-  } else {
+  }
+  else
+  {
+    // Update the IoT Cloud variables
     humidity = humi;
     temperature = tempC;
   }
 
+  // Wait for 3 seconds before the next reading
   delay(3000);
 }
